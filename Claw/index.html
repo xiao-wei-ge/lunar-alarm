@@ -1,0 +1,1031 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>农历初一十五 · 闹钟</title>
+
+  <!-- PWA 必要配置 -->
+  <link rel="manifest" href="manifest.json" />
+  <meta name="theme-color" content="#d4a017" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="农历闹钟" />
+  <meta name="application-name" content="农历初一十五闹钟" />
+  <meta name="description" content="专为农历初一、十五设计的提醒闹钟，永不错过吉祥日子" />
+  <meta name="msapplication-TileColor" content="#0f0600" />
+
+  <!-- 图标 -->
+  <link rel="icon" type="image/svg+xml" href="icons/icon.svg" />
+  <link rel="apple-touch-icon" href="icons/icon.svg" />
+
+  <!-- Open Graph -->
+  <meta property="og:title" content="农历初一十五闹钟" />
+  <meta property="og:description" content="专为农历初一、十五设计的提醒闹钟" />
+  <meta property="og:type" content="website" />
+  <style>
+    :root {
+      --red:    #c0392b;
+      --gold:   #d4a017;
+      --dark:   #1a0a00;
+      --bg:     #0f0600;
+      --card:   rgba(255,255,255,0.05);
+      --border: rgba(212,160,23,0.25);
+      --text:   #f5e6c8;
+      --muted:  #a08060;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: "PingFang SC", "Microsoft YaHei", sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    /* ── 顶部 Header ── */
+    header {
+      width: 100%;
+      max-width: 480px;
+      text-align: center;
+      padding: 36px 20px 20px;
+    }
+    header .lantern-row {
+      display: flex;
+      justify-content: center;
+      gap: 12px;
+      margin-bottom: 14px;
+    }
+    .lantern { font-size: 32px; animation: swing 3s ease-in-out infinite alternate; }
+    .lantern:nth-child(2) { animation-delay: .5s; }
+    .lantern:nth-child(3) { animation-delay: 1s; }
+    @keyframes swing {
+      from { transform: rotate(-6deg); }
+      to   { transform: rotate(6deg); }
+    }
+    header h1 {
+      font-size: 22px;
+      font-weight: 700;
+      letter-spacing: 4px;
+      color: var(--gold);
+      text-shadow: 0 0 18px rgba(212,160,23,.6);
+    }
+    header p {
+      font-size: 12px;
+      color: var(--muted);
+      margin-top: 6px;
+      letter-spacing: 1px;
+    }
+
+    /* ── 今日面板 ── */
+    .today-card {
+      width: calc(100% - 40px);
+      max-width: 440px;
+      background: linear-gradient(135deg, rgba(192,57,43,.18), rgba(212,160,23,.12));
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 22px 24px;
+      margin-bottom: 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .today-left .solar {
+      font-size: 13px;
+      color: var(--muted);
+      margin-bottom: 4px;
+    }
+    .today-left .lunar-date {
+      font-size: 26px;
+      font-weight: 700;
+      color: var(--gold);
+    }
+    .today-left .lunar-sub {
+      font-size: 12px;
+      color: var(--muted);
+      margin-top: 4px;
+    }
+    .today-right {
+      text-align: right;
+    }
+    .today-right .countdown-label {
+      font-size: 11px;
+      color: var(--muted);
+      margin-bottom: 4px;
+    }
+    .today-right .countdown-val {
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--red);
+    }
+    .badge {
+      display: inline-block;
+      background: var(--red);
+      color: #fff;
+      font-size: 11px;
+      padding: 3px 10px;
+      border-radius: 20px;
+      margin-top: 6px;
+      letter-spacing: 1px;
+    }
+    .badge.gold { background: var(--gold); color: var(--dark); }
+
+    /* ── 未来提醒列表 ── */
+    .section-title {
+      width: calc(100% - 40px);
+      max-width: 440px;
+      font-size: 13px;
+      color: var(--gold);
+      letter-spacing: 2px;
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .section-title::after {
+      content: "";
+      flex: 1;
+      height: 1px;
+      background: var(--border);
+    }
+
+    .upcoming-list {
+      width: calc(100% - 40px);
+      max-width: 440px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-bottom: 24px;
+    }
+    .upcoming-item {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 14px 18px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+    .upcoming-item .icon {
+      font-size: 26px;
+      flex-shrink: 0;
+    }
+    .upcoming-item .info { flex: 1; }
+    .upcoming-item .info .name {
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--text);
+    }
+    .upcoming-item .info .dates {
+      font-size: 12px;
+      color: var(--muted);
+      margin-top: 3px;
+    }
+    .upcoming-item .alarm-time {
+      text-align: right;
+    }
+    .upcoming-item .alarm-time .time {
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--gold);
+    }
+    .upcoming-item .alarm-time .days-left {
+      font-size: 11px;
+      color: var(--muted);
+      margin-top: 2px;
+    }
+    .toggle-btn {
+      width: 46px;
+      height: 26px;
+      border-radius: 13px;
+      background: #333;
+      border: none;
+      cursor: pointer;
+      position: relative;
+      transition: background .3s;
+      flex-shrink: 0;
+    }
+    .toggle-btn.on { background: var(--red); }
+    .toggle-btn::after {
+      content: "";
+      position: absolute;
+      width: 20px; height: 20px;
+      background: #fff;
+      border-radius: 50%;
+      top: 3px; left: 3px;
+      transition: transform .3s;
+    }
+    .toggle-btn.on::after { transform: translateX(20px); }
+
+    /* ── 设置面板 ── */
+    .settings-card {
+      width: calc(100% - 40px);
+      max-width: 440px;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 20px 24px;
+      margin-bottom: 24px;
+    }
+    .settings-card h3 {
+      font-size: 14px;
+      color: var(--gold);
+      letter-spacing: 2px;
+      margin-bottom: 18px;
+    }
+    .setting-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 0;
+      border-bottom: 1px solid rgba(255,255,255,.05);
+    }
+    .setting-row:last-child { border-bottom: none; }
+    .setting-row .label {
+      font-size: 14px;
+      color: var(--text);
+    }
+    .setting-row .sublabel {
+      font-size: 11px;
+      color: var(--muted);
+      margin-top: 2px;
+    }
+    .time-input {
+      background: rgba(255,255,255,.08);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      color: var(--gold);
+      font-size: 16px;
+      font-weight: 700;
+      padding: 6px 10px;
+      width: 90px;
+      text-align: center;
+      outline: none;
+      cursor: pointer;
+    }
+    .time-input:focus { border-color: var(--gold); }
+
+    /* Ringtone select */
+    .ringtone-select {
+      background: rgba(255,255,255,.08);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      color: var(--text);
+      font-size: 13px;
+      padding: 6px 10px;
+      outline: none;
+      cursor: pointer;
+    }
+    .ringtone-select option { background: #1a0a00; }
+
+    /* advance days */
+    .advance-select {
+      background: rgba(255,255,255,.08);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      color: var(--text);
+      font-size: 13px;
+      padding: 6px 10px;
+      outline: none;
+      cursor: pointer;
+    }
+    .advance-select option { background: #1a0a00; }
+
+    /* ── 保存按钮 ── */
+    .save-btn {
+      width: calc(100% - 40px);
+      max-width: 440px;
+      padding: 16px;
+      background: linear-gradient(135deg, #c0392b, #8b1a10);
+      color: #fff;
+      font-size: 16px;
+      font-weight: 700;
+      letter-spacing: 3px;
+      border: none;
+      border-radius: 50px;
+      cursor: pointer;
+      box-shadow: 0 6px 24px rgba(192,57,43,.4);
+      transition: transform .15s, box-shadow .15s;
+      margin-bottom: 36px;
+    }
+    .save-btn:hover { transform: translateY(-2px); box-shadow: 0 10px 30px rgba(192,57,43,.5); }
+    .save-btn:active { transform: translateY(0); }
+
+    /* ── Toast ── */
+    .toast {
+      position: fixed;
+      bottom: 40px;
+      left: 50%;
+      transform: translateX(-50%) translateY(20px);
+      background: rgba(30,10,0,.95);
+      border: 1px solid var(--gold);
+      color: var(--gold);
+      padding: 12px 28px;
+      border-radius: 30px;
+      font-size: 14px;
+      letter-spacing: 1px;
+      opacity: 0;
+      transition: opacity .3s, transform .3s;
+      pointer-events: none;
+      z-index: 999;
+      white-space: nowrap;
+    }
+    .toast.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+
+    /* ── 闹铃弹窗 ── */
+    .alarm-modal {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,.75);
+      z-index: 1000;
+      align-items: center;
+      justify-content: center;
+    }
+    .alarm-modal.show { display: flex; }
+    .alarm-box {
+      background: linear-gradient(160deg, #200800, #3a0d00);
+      border: 2px solid var(--gold);
+      border-radius: 28px;
+      padding: 36px 32px;
+      text-align: center;
+      max-width: 320px;
+      width: 90%;
+      animation: popIn .4s cubic-bezier(.34,1.56,.64,1);
+    }
+    @keyframes popIn {
+      from { transform: scale(.7); opacity: 0; }
+      to   { transform: scale(1); opacity: 1; }
+    }
+    .alarm-box .alarm-emoji { font-size: 56px; margin-bottom: 12px; animation: ring 0.5s infinite alternate; }
+    @keyframes ring {
+      from { transform: rotate(-15deg); }
+      to   { transform: rotate(15deg); }
+    }
+    .alarm-box h2 { font-size: 22px; color: var(--gold); margin-bottom: 6px; }
+    .alarm-box p  { font-size: 14px; color: var(--muted); margin-bottom: 24px; }
+    .dismiss-btn {
+      background: var(--red);
+      color: #fff;
+      border: none;
+      padding: 12px 40px;
+      border-radius: 30px;
+      font-size: 15px;
+      font-weight: 700;
+      cursor: pointer;
+      letter-spacing: 2px;
+    }
+
+    /* ── 年份日历 ── */
+    .calendar-grid {
+      width: calc(100% - 40px);
+      max-width: 440px;
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
+      margin-bottom: 30px;
+    }
+    .cal-month {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 12px;
+    }
+    .cal-month .month-label {
+      font-size: 12px;
+      color: var(--gold);
+      letter-spacing: 1px;
+      margin-bottom: 8px;
+      text-align: center;
+    }
+    .cal-dates {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 4px;
+      justify-content: center;
+    }
+    .cal-dot {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 2px;
+      font-size: 10px;
+      color: var(--muted);
+      width: 36px;
+    }
+    .cal-dot .dot {
+      width: 30px; height: 30px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      font-weight: 600;
+      border: 1px solid transparent;
+    }
+    .cal-dot.new-moon .dot {
+      background: rgba(192,57,43,.25);
+      border-color: var(--red);
+      color: #fff;
+    }
+    .cal-dot.full-moon .dot {
+      background: rgba(212,160,23,.25);
+      border-color: var(--gold);
+      color: var(--gold);
+    }
+    .cal-dot.past .dot { opacity: .4; }
+    .cal-dot.today-dot .dot {
+      box-shadow: 0 0 0 2px #fff;
+    }
+
+    /* scroll */
+    ::-webkit-scrollbar { width: 4px; }
+    ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+  </style>
+</head>
+<body>
+
+<!-- Header -->
+<header>
+  <div class="lantern-row">
+    <span class="lantern">🏮</span>
+    <span class="lantern">🏮</span>
+    <span class="lantern">🏮</span>
+  </div>
+  <h1>农历初一十五 闹钟</h1>
+  <p>记录每月的吉祥日子</p>
+</header>
+
+<!-- 今日状态 -->
+<div class="today-card" id="todayCard">
+  <div class="today-left">
+    <div class="solar" id="solarDate">--</div>
+    <div class="lunar-date" id="lunarDate">--月--日</div>
+    <div class="lunar-sub" id="lunarSub">--</div>
+  </div>
+  <div class="today-right" id="todayRight">
+    <div class="countdown-label">下次节点</div>
+    <div class="countdown-val" id="nextDays">--天</div>
+    <div id="nextInfo" style="font-size:12px;color:var(--muted);margin-top:4px;">--</div>
+  </div>
+</div>
+
+<!-- 即将到来的提醒 -->
+<div class="section-title">即将到来</div>
+<div class="upcoming-list" id="upcomingList"></div>
+
+<!-- 闹钟设置 -->
+<div class="section-title">闹钟设置</div>
+<div class="settings-card">
+  <h3>🔔 全局提醒配置</h3>
+
+  <div class="setting-row">
+    <div>
+      <div class="label">初一提醒</div>
+      <div class="sublabel">每月农历初一响铃</div>
+    </div>
+    <button class="toggle-btn on" id="toggleNewMoon" onclick="toggleSwitch(this)"></button>
+  </div>
+
+  <div class="setting-row">
+    <div>
+      <div class="label">初一提醒时间</div>
+    </div>
+    <input type="time" class="time-input" id="timeNewMoon" value="07:00" />
+  </div>
+
+  <div class="setting-row">
+    <div>
+      <div class="label">十五提醒</div>
+      <div class="sublabel">每月农历十五响铃</div>
+    </div>
+    <button class="toggle-btn on" id="toggleFullMoon" onclick="toggleSwitch(this)"></button>
+  </div>
+
+  <div class="setting-row">
+    <div>
+      <div class="label">十五提醒时间</div>
+    </div>
+    <input type="time" class="time-input" id="timeFullMoon" value="07:00" />
+  </div>
+
+  <div class="setting-row">
+    <div>
+      <div class="label">提前提醒</div>
+      <div class="sublabel">在节点前N天预先通知</div>
+    </div>
+    <select class="advance-select" id="advanceDays">
+      <option value="0">不提前</option>
+      <option value="1" selected>提前1天</option>
+      <option value="2">提前2天</option>
+      <option value="3">提前3天</option>
+    </select>
+  </div>
+
+  <div class="setting-row">
+    <div>
+      <div class="label">铃声</div>
+    </div>
+    <select class="ringtone-select" id="ringtone">
+      <option value="beep">默认提示音</option>
+      <option value="temple">寺庙钟声</option>
+      <option value="gong">铜锣</option>
+    </select>
+  </div>
+</div>
+
+<button class="save-btn" onclick="saveSettings()">保 存 设 置</button>
+
+<!-- 全年节点日历 -->
+<div class="section-title">今年节点日历</div>
+<div class="calendar-grid" id="calendarGrid"></div>
+
+<!-- PWA 安装横幅 -->
+<div id="installBanner" style="display:none;position:fixed;bottom:0;left:0;right:0;background:linear-gradient(135deg,#1a0800,#2a1000);border-top:1px solid rgba(212,160,23,.4);padding:14px 20px;align-items:center;gap:12px;z-index:998;">
+  <span style="font-size:28px;">🏮</span>
+  <div style="flex:1;">
+    <div style="font-size:14px;font-weight:700;color:#f5e6c8;">添加到主屏幕</div>
+    <div style="font-size:11px;color:#a08060;margin-top:2px;">像原生 App 一样使用，支持离线</div>
+  </div>
+  <button onclick="installPWA()" style="background:#c0392b;color:#fff;border:none;padding:9px 18px;border-radius:20px;font-size:13px;font-weight:700;cursor:pointer;white-space:nowrap;">立即安装</button>
+  <button onclick="document.getElementById('installBanner').style.display='none'" style="background:transparent;color:#a08060;border:none;font-size:18px;cursor:pointer;padding:4px;">✕</button>
+</div>
+
+<!-- Toast -->
+
+<div class="toast" id="toast"></div>
+
+<!-- 闹铃弹窗 -->
+<div class="alarm-modal" id="alarmModal">
+  <div class="alarm-box">
+    <div class="alarm-emoji" id="alarmEmoji">🏮</div>
+    <h2 id="alarmTitle">农历初一</h2>
+    <p id="alarmDesc">今天是农历初一，吉祥如意！</p>
+    <button class="dismiss-btn" onclick="dismissAlarm()">知道了</button>
+  </div>
+</div>
+
+<script>
+// ══════════════════════════════════════════════
+//  农历核心算法（1900–2100）
+//  基于寿星万年历算法简化版
+// ══════════════════════════════════════════════
+
+const lunarInfo = [
+  0x04bd8,0x04ae0,0x0a570,0x054d5,0x0d260,0x0d950,0x16554,0x056a0,0x09ad0,0x055d2,
+  0x04ae0,0x0a5b6,0x0a4d0,0x0d250,0x1d255,0x0b540,0x0d6a0,0x0ada2,0x095b0,0x14977,
+  0x04970,0x0a4b0,0x0b4b5,0x06a50,0x06d40,0x1ab54,0x02b60,0x09570,0x052f2,0x04970,
+  0x06566,0x0d4a0,0x0ea50,0x06e95,0x05ad0,0x02b60,0x186e3,0x092e0,0x1c8d7,0x0c950,
+  0x0d4a0,0x1d8a6,0x0b550,0x056a0,0x1a5b4,0x025d0,0x092d0,0x0d2b2,0x0a950,0x0b557,
+  0x06ca0,0x0b550,0x15355,0x04da0,0x0a5b0,0x14573,0x052b0,0x0a9a8,0x0e950,0x06aa0,
+  0x0aea6,0x0ab50,0x04b60,0x0aae4,0x0a570,0x05260,0x0f263,0x0d950,0x05b57,0x056a0,
+  0x096d0,0x04dd5,0x04ad0,0x0a4d0,0x0d4d4,0x0d250,0x0d558,0x0b540,0x0b6a0,0x195a6,
+  0x095b0,0x049b0,0x0a974,0x0a4b0,0x0b27a,0x06a50,0x06d40,0x0af46,0x0ab60,0x09570,
+  0x04af5,0x04970,0x064b0,0x074a3,0x0ea50,0x06aa0,0x0a6b6,0x056a0,0x02b40,0x0aae4,
+  0x0a2e0,0x0c2e0,0x0d2e3,0x0c960,0x0d557,0x0d4a0,0x0da50,0x05d55,0x056a0,0x0a6d0,
+  0x055d4,0x052d0,0x0a9b8,0x0a950,0x0b4a0,0x0b6a6,0x0ad50,0x055a0,0x0aba4,0x0a5b0,
+  0x052b0,0x0b273,0x06930,0x07337,0x06aa0,0x0ad50,0x14b55,0x04b60,0x0a570,0x054e4,
+  0x0d160,0x0e968,0x0d520,0x0daa0,0x16aa6,0x056d0,0x04ae0,0x0a9d4,0x0a2d0,0x0d150,
+  0x0f252,0x0d520
+];
+
+const Gan = ["甲","乙","丙","丁","戊","己","庚","辛","壬","癸"];
+const Zhi = ["子","丑","寅","卯","辰","巳","午","未","申","酉","戌","亥"];
+const Animals = ["鼠","牛","虎","兔","龙","蛇","马","羊","猴","鸡","狗","猪"];
+const monthNames = ["正","二","三","四","五","六","七","八","九","十","冬","腊"];
+const dayNames = [
+  "初一","初二","初三","初四","初五","初六","初七","初八","初九","初十",
+  "十一","十二","十三","十四","十五","十六","十七","十八","十九","二十",
+  "廿一","廿二","廿三","廿四","廿五","廿六","廿七","廿八","廿九","三十"
+];
+
+function leapMonth(y) { return lunarInfo[y-1900] & 0xf; }
+function leapDays(y) {
+  if (leapMonth(y)) return (lunarInfo[y-1900] & 0x10000) ? 30 : 29;
+  return 0;
+}
+function monthDays(y, m) {
+  return (lunarInfo[y-1900] & (0x10000 >> m)) ? 30 : 29;
+}
+function yearDays(y) {
+  let i, sum = 348;
+  for (i=0x8000; i>0x8; i>>=1) if (lunarInfo[y-1900] & i) sum+=1;
+  return sum + leapDays(y);
+}
+
+// 公历 → 农历
+function solar2Lunar(y, m, d) {
+  let offset = (Date.UTC(y, m-1, d) - Date.UTC(1900, 0, 31)) / 86400000;
+  let i, temp = 0, leap = 0, isLeap = false;
+  for (i=1900; i<2101 && offset>0; i++) {
+    temp = yearDays(i);
+    offset -= temp;
+  }
+  if (offset < 0) { offset += temp; i--; }
+  let lunarYear = i;
+  let leapM = leapMonth(i);
+  isLeap = false;
+  for (i=1; i<13 && offset>0; i++) {
+    if (leapM > 0 && i === leapM+1 && !isLeap) {
+      --i; isLeap = true; temp = leapDays(lunarYear);
+    } else {
+      temp = monthDays(lunarYear, i);
+    }
+    if (isLeap && i === leapM+1) isLeap = false;
+    offset -= temp;
+  }
+  if (offset === 0 && leapM > 0 && i === leapM+1) {
+    if (isLeap) isLeap = false; else { isLeap = true; --i; }
+  }
+  if (offset < 0) { offset += temp; --i; }
+  const lunarMonth = i;
+  const lunarDay = offset + 1;
+  const cyclical = (lunarYear - 1900 + 36) % 60;
+  return {
+    year: lunarYear,
+    month: lunarMonth,
+    day: lunarDay,
+    isLeap,
+    monthName: (isLeap ? "闰" : "") + monthNames[lunarMonth-1] + "月",
+    dayName: dayNames[lunarDay-1],
+    ganZhi: Gan[cyclical%10] + Zhi[cyclical%12] + "年",
+    animal: Animals[(lunarYear-4) % 12]
+  };
+}
+
+// 某农历月份的初一对应的公历日期
+// 这里用简单迭代：给定公历范围，找初一/十五
+function findLunarDays(yearFrom, yearTo) {
+  const results = [];
+  const today = new Date();
+  today.setHours(0,0,0,0);
+  for (let y = yearFrom; y <= yearTo; y++) {
+    for (let m = 1; m <= 12; m++) {
+      // 遍历该公历月所有天
+      const days = new Date(y, m, 0).getDate();
+      for (let d = 1; d <= days; d++) {
+        const lunar = solar2Lunar(y, m, d);
+        if (lunar.day === 1 && !lunar.isLeap) {
+          const dt = new Date(y, m-1, d);
+          results.push({ type: 'new', date: dt, lunar, label: `农历${lunar.monthName}初一` });
+        } else if (lunar.day === 15 && !lunar.isLeap) {
+          const dt = new Date(y, m-1, d);
+          results.push({ type: 'full', date: dt, lunar, label: `农历${lunar.monthName}十五` });
+        }
+      }
+    }
+  }
+  return results.sort((a,b) => a.date - b.date);
+}
+
+// 格式化
+function fmt(date) {
+  const y = date.getFullYear();
+  const m = String(date.getMonth()+1).padStart(2,'0');
+  const d = String(date.getDate()).padStart(2,'0');
+  const weeks = ['日','一','二','三','四','五','六'];
+  return `${y}年${m}月${d}日 周${weeks[date.getDay()]}`;
+}
+function fmtShort(date) {
+  return `${date.getMonth()+1}月${date.getDate()}日`;
+}
+
+// ══════════════════════════════════════════════
+//  全局状态
+// ══════════════════════════════════════════════
+const today = new Date();
+today.setHours(0,0,0,0);
+const curYear = today.getFullYear();
+
+// 计算本年 + 下年的所有初一十五
+const allDays = findLunarDays(curYear, curYear+1);
+
+// 设置
+let settings = {
+  newMoon: true,
+  fullMoon: true,
+  timeNewMoon: '07:00',
+  timeFullMoon: '07:00',
+  advanceDays: 1,
+  ringtone: 'beep'
+};
+
+// 加载保存的设置
+function loadSettings() {
+  const s = localStorage.getItem('lunarAlarmSettings');
+  if (s) {
+    try { settings = { ...settings, ...JSON.parse(s) }; } catch(e) {}
+  }
+  document.getElementById('toggleNewMoon').className = 'toggle-btn' + (settings.newMoon ? ' on' : '');
+  document.getElementById('toggleFullMoon').className = 'toggle-btn' + (settings.fullMoon ? ' on' : '');
+  document.getElementById('timeNewMoon').value = settings.timeNewMoon;
+  document.getElementById('timeFullMoon').value = settings.timeFullMoon;
+  document.getElementById('advanceDays').value = settings.advanceDays;
+  document.getElementById('ringtone').value = settings.ringtone;
+}
+
+// ══════════════════════════════════════════════
+//  UI 渲染
+// ══════════════════════════════════════════════
+
+function renderToday() {
+  const lunar = solar2Lunar(today.getFullYear(), today.getMonth()+1, today.getDate());
+  document.getElementById('solarDate').textContent = fmt(today);
+  document.getElementById('lunarDate').textContent = lunar.monthName + lunar.dayName;
+  document.getElementById('lunarSub').textContent = lunar.ganZhi + ' ' + lunar.animal + '年';
+
+  // 今天是否就是初一/十五
+  const todayCard = document.getElementById('todayCard');
+  if (lunar.day === 1) {
+    document.getElementById('todayRight').innerHTML =
+      '<div class="badge">今日初一</div>';
+    todayCard.style.background = 'linear-gradient(135deg,rgba(192,57,43,.35),rgba(212,160,23,.15))';
+  } else if (lunar.day === 15) {
+    document.getElementById('todayRight').innerHTML =
+      '<div class="badge gold">今日十五</div>';
+    todayCard.style.background = 'linear-gradient(135deg,rgba(212,160,23,.3),rgba(192,57,43,.1))';
+  } else {
+    // 下一个节点
+    const next = allDays.find(x => x.date > today);
+    if (next) {
+      const diff = Math.round((next.date - today) / 86400000);
+      document.getElementById('nextDays').textContent = diff + '天';
+      document.getElementById('nextInfo').textContent = next.label + ' · ' + fmtShort(next.date);
+    }
+  }
+}
+
+function renderUpcoming() {
+  const list = document.getElementById('upcomingList');
+  list.innerHTML = '';
+  const upcoming = allDays.filter(x => x.date >= today).slice(0, 6);
+  upcoming.forEach((item, idx) => {
+    const diff = Math.round((item.date - today) / 86400000);
+    const isNew = item.type === 'new';
+    const alarmTime = isNew ? settings.timeNewMoon : settings.timeFullMoon;
+    const enabled = isNew ? settings.newMoon : settings.fullMoon;
+    const advDiff = Math.round((item.date - today) / 86400000) - settings.advanceDays;
+
+    const el = document.createElement('div');
+    el.className = 'upcoming-item';
+    el.innerHTML = `
+      <div class="icon">${isNew ? '🌑' : '🌕'}</div>
+      <div class="info">
+        <div class="name">${item.label}</div>
+        <div class="dates">
+          农历 ${item.lunar.monthName}${item.lunar.dayName}
+          &nbsp;·&nbsp; 公历 ${fmtShort(item.date)}
+        </div>
+        ${settings.advanceDays > 0 && diff > 0 ? `<div class="dates" style="color:var(--muted)">提前${settings.advanceDays}天：${fmtShort(new Date(item.date.getTime()-settings.advanceDays*86400000))} 提醒</div>` : ''}
+      </div>
+      <div class="alarm-time">
+        <div class="time">${alarmTime}</div>
+        <div class="days-left">${diff === 0 ? '今天' : diff + '天后'}</div>
+      </div>
+      <button class="toggle-btn ${enabled ? 'on' : ''}" onclick="toggleSwitch(this)"></button>
+    `;
+    list.appendChild(el);
+  });
+}
+
+function renderCalendar() {
+  const grid = document.getElementById('calendarGrid');
+  grid.innerHTML = '';
+  // 按公历月分组（只显示本年）
+  const months = {};
+  allDays.filter(x => x.date.getFullYear() === curYear).forEach(item => {
+    const mk = item.date.getMonth();
+    if (!months[mk]) months[mk] = [];
+    months[mk].push(item);
+  });
+  const monthLabels = ['1月','2月','3月','4月','5月','6月','7月','8月','9月','10月','11月','12月'];
+  // 补全12个月
+  for (let mo = 0; mo < 12; mo++) {
+    const card = document.createElement('div');
+    card.className = 'cal-month';
+    card.innerHTML = `<div class="month-label">${monthLabels[mo]}</div><div class="cal-dates" id="calMonth${mo}"></div>`;
+    grid.appendChild(card);
+    const container = card.querySelector('.cal-dates');
+    const items = months[mo] || [];
+    if (items.length === 0) {
+      container.innerHTML = '<span style="font-size:11px;color:var(--muted)">无节点</span>';
+    }
+    items.forEach(item => {
+      const isPast = item.date < today;
+      const isToday = item.date.getTime() === today.getTime();
+      const dot = document.createElement('div');
+      dot.className = 'cal-dot ' + (item.type === 'new' ? 'new-moon' : 'full-moon') + (isPast ? ' past' : '') + (isToday ? ' today-dot' : '');
+      dot.innerHTML = `
+        <div class="dot">${item.date.getDate()}</div>
+        <span>${item.type === 'new' ? '初一' : '十五'}</span>
+      `;
+      container.appendChild(dot);
+    });
+  }
+}
+
+// ══════════════════════════════════════════════
+//  交互逻辑
+// ══════════════════════════════════════════════
+function toggleSwitch(btn) {
+  btn.classList.toggle('on');
+}
+
+function saveSettings() {
+  settings.newMoon  = document.getElementById('toggleNewMoon').classList.contains('on');
+  settings.fullMoon = document.getElementById('toggleFullMoon').classList.contains('on');
+  settings.timeNewMoon  = document.getElementById('timeNewMoon').value;
+  settings.timeFullMoon = document.getElementById('timeFullMoon').value;
+  settings.advanceDays  = parseInt(document.getElementById('advanceDays').value);
+  settings.ringtone     = document.getElementById('ringtone').value;
+  localStorage.setItem('lunarAlarmSettings', JSON.stringify(settings));
+  renderUpcoming();
+  showToast('✅ 设置已保存！');
+  scheduleAlarmCheck();
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2500);
+}
+
+// ── 闹铃检测 ──
+function checkAlarm() {
+  if (!settings.newMoon && !settings.fullMoon) return;
+  const now = new Date();
+  const hhmm = String(now.getHours()).padStart(2,'0') + ':' + String(now.getMinutes()).padStart(2,'0');
+  const todayKey = `${now.getFullYear()}-${now.getMonth()}-${now.getDate()}`;
+  const firedKey = 'lunarFired_' + todayKey;
+  const fired = JSON.parse(localStorage.getItem(firedKey) || '[]');
+
+  allDays.forEach(item => {
+    // 本体日期
+    const isItemToday = item.date.getTime() === today.getTime();
+    const isNew = item.type === 'new';
+    const enabled = isNew ? settings.newMoon : settings.fullMoon;
+    const alarmTime = isNew ? settings.timeNewMoon : settings.timeFullMoon;
+    if (!enabled) return;
+
+    const fireId_main = item.label + '_main';
+    if (isItemToday && hhmm === alarmTime && !fired.includes(fireId_main)) {
+      fired.push(fireId_main);
+      localStorage.setItem(firedKey, JSON.stringify(fired));
+      triggerAlarm(isNew, item.lunar.monthName, false);
+    }
+
+    // 提前提醒
+    if (settings.advanceDays > 0) {
+      const advDate = new Date(item.date.getTime() - settings.advanceDays * 86400000);
+      advDate.setHours(0,0,0,0);
+      const isAdvToday = advDate.getTime() === today.getTime();
+      const fireId_adv = item.label + '_adv';
+      if (isAdvToday && hhmm === alarmTime && !fired.includes(fireId_adv)) {
+        fired.push(fireId_adv);
+        localStorage.setItem(firedKey, JSON.stringify(fired));
+        triggerAlarm(isNew, item.lunar.monthName, true, settings.advanceDays);
+      }
+    }
+  });
+}
+
+function triggerAlarm(isNew, monthName, isAdvance, days) {
+  const modal = document.getElementById('alarmModal');
+  document.getElementById('alarmEmoji').textContent = isNew ? '🌑' : '🌕';
+  if (isAdvance) {
+    document.getElementById('alarmTitle').textContent = `提前提醒`;
+    document.getElementById('alarmDesc').textContent = `距${monthName}${isNew?'初一':'十五'}还有 ${days} 天，提前做好准备！`;
+  } else {
+    document.getElementById('alarmTitle').textContent = `农历${monthName}${isNew?'初一':'十五'}`;
+    document.getElementById('alarmDesc').textContent = isNew ? `今天是农历${monthName}初一，新月新气象，吉祥如意！` : `今天是农历${monthName}十五，月圆人团圆，万事顺遂！`;
+  }
+  modal.classList.add('show');
+  playSound(settings.ringtone);
+}
+
+function dismissAlarm() {
+  document.getElementById('alarmModal').classList.remove('show');
+  stopSound();
+}
+
+// ── 声音 ──
+let audioCtx = null;
+let alarmInterval = null;
+
+function playSound(type) {
+  stopSound();
+  audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  function beep(freq, dur, delay) {
+    const osc = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+    osc.connect(gain); gain.connect(audioCtx.destination);
+    osc.type = 'sine';
+    osc.frequency.value = freq;
+    gain.gain.setValueAtTime(0.5, audioCtx.currentTime + delay);
+    gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + delay + dur);
+    osc.start(audioCtx.currentTime + delay);
+    osc.stop(audioCtx.currentTime + delay + dur + 0.05);
+  }
+  function playOnce() {
+    if (type === 'temple') {
+      beep(220, 2.0, 0); beep(196, 1.5, 0.5);
+    } else if (type === 'gong') {
+      beep(110, 2.5, 0); beep(82, 2.0, 0.3); beep(65, 1.8, 0.6);
+    } else {
+      beep(880, 0.2, 0); beep(1100, 0.2, 0.3); beep(880, 0.2, 0.6);
+    }
+  }
+  playOnce();
+  alarmInterval = setInterval(playOnce, 2000);
+}
+
+function stopSound() {
+  if (alarmInterval) { clearInterval(alarmInterval); alarmInterval = null; }
+  if (audioCtx) { audioCtx.close(); audioCtx = null; }
+}
+
+// ── 定时检测（每分钟）──
+function scheduleAlarmCheck() {
+  checkAlarm();
+  const now = new Date();
+  const msToNextMin = (60 - now.getSeconds()) * 1000 - now.getMilliseconds();
+  setTimeout(() => {
+    checkAlarm();
+    setInterval(checkAlarm, 60000);
+  }, msToNextMin);
+}
+
+// ══════════════════════════════════════════════
+//  初始化
+// ══════════════════════════════════════════════
+loadSettings();
+renderToday();
+renderUpcoming();
+renderCalendar();
+scheduleAlarmCheck();
+
+// ── Service Worker 注册 ──
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('./sw.js')
+      .then(reg => {
+        console.log('[SW] 注册成功:', reg.scope);
+      })
+      .catch(err => {
+        console.warn('[SW] 注册失败:', err);
+      });
+  });
+}
+
+// ── 通知权限请求 ──
+async function requestNotificationPermission() {
+  if (!('Notification' in window)) return;
+  if (Notification.permission === 'default') {
+    const perm = await Notification.requestPermission();
+    if (perm === 'granted') {
+      showToast('🔔 通知已开启，即使页面关闭也能收到提醒！');
+    }
+  }
+}
+
+// 延迟 3 秒再请求权限，避免一进来就弹权限框影响体验
+setTimeout(requestNotificationPermission, 3000);
+
+// ── PWA 安装提示 ──
+let deferredPrompt = null;
+window.addEventListener('beforeinstallprompt', (e) => {
+  e.preventDefault();
+  deferredPrompt = e;
+  // 显示自定义安装横幅
+  const banner = document.getElementById('installBanner');
+  if (banner) banner.style.display = 'flex';
+});
+
+function installPWA() {
+  if (!deferredPrompt) return;
+  deferredPrompt.prompt();
+  deferredPrompt.userChoice.then(choice => {
+    if (choice.outcome === 'accepted') {
+      showToast('🎉 安装成功！可从桌面启动啦');
+    }
+    deferredPrompt = null;
+    const banner = document.getElementById('installBanner');
+    if (banner) banner.style.display = 'none';
+  });
+}
+
+window.addEventListener('appinstalled', () => {
+  showToast('✅ 已安装到主屏幕！');
+  deferredPrompt = null;
+});
+</script>
+</body>
+</html>

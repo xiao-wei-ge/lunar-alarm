@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <title>农历闹钟 · APK 打包指南</title>
+  <style>
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{font-family:"PingFang SC","Microsoft YaHei",sans-serif;background:#0f0600;color:#f5e6c8;min-height:100vh;padding:30px 20px}
+    h1{font-size:22px;color:#d4a017;text-align:center;margin-bottom:6px;letter-spacing:3px}
+    .sub{text-align:center;color:#a08060;font-size:13px;margin-bottom:36px}
+    .step{background:rgba(255,255,255,.05);border:1px solid rgba(212,160,23,.25);border-radius:16px;padding:22px 24px;margin-bottom:18px;max-width:700px;margin-left:auto;margin-right:auto}
+    .step-num{display:inline-flex;align-items:center;justify-content:center;width:32px;height:32px;border-radius:50%;background:#c0392b;color:#fff;font-weight:700;font-size:14px;flex-shrink:0;margin-right:12px}
+    .step-title{font-size:16px;font-weight:700;color:#ffe066;display:flex;align-items:center;margin-bottom:12px}
+    .step p,.step li{font-size:14px;color:#d0c0a0;line-height:1.8;margin-bottom:6px}
+    .step ul{padding-left:20px}
+    .step code{background:rgba(212,160,23,.15);border:1px solid rgba(212,160,23,.3);border-radius:4px;padding:2px 8px;font-family:monospace;font-size:13px;color:#ffe066}
+    .step .link{color:#d4a017;font-weight:700;text-decoration:none;border-bottom:1px dashed #d4a017}
+    .step .link:hover{color:#ffe066}
+    .highlight{background:rgba(192,57,43,.2);border:1px solid rgba(192,57,43,.4);border-radius:10px;padding:14px 18px;margin-top:12px;font-size:13px;color:#f0c0a0}
+    .file-tree{background:rgba(0,0,0,.3);border:1px solid rgba(255,255,255,.1);border-radius:10px;padding:16px 20px;font-family:monospace;font-size:13px;line-height:2;color:#a0d0a0;margin-top:12px}
+    .file-tree .dir{color:#d4a017}
+    .btn-link{display:inline-block;background:#c0392b;color:#fff;padding:11px 28px;border-radius:30px;font-size:14px;font-weight:700;text-decoration:none;margin-top:14px;letter-spacing:1px}
+    .tip{background:rgba(212,160,23,.08);border-left:3px solid #d4a017;padding:10px 14px;border-radius:0 8px 8px 0;font-size:13px;color:#d0b080;margin-top:12px}
+    .done{text-align:center;font-size:36px;margin:30px 0 10px}
+  </style>
+</head>
+<body>
+
+<h1>🏮 农历闹钟 · APK 打包指南</h1>
+<p class="sub">从 PWA 到 Android APK，全程免安装工具</p>
+
+<!-- Step 1 -->
+<div class="step">
+  <div class="step-title"><span class="step-num">1</span>确认项目文件齐全</div>
+  <p>你的项目目录应该包含以下文件：</p>
+  <div class="file-tree">
+<span class="dir">Claw/</span>
+├── index.html         <span style="color:#a08060">← 主页面（PWA 入口）</span>
+├── lunar-alarm.html   <span style="color:#a08060">← 重定向到 index.html（向后兼容）</span>
+├── manifest.json      <span style="color:#a08060">← PWA 配置</span>
+├── sw.js              <span style="color:#a08060">← Service Worker（离线缓存）</span>
+└── <span class="dir">icons/</span>
+    ├── icon.svg           <span style="color:#a08060">← SVG 矢量图标</span>
+    ├── icon-maskable.svg  <span style="color:#a08060">← 可遮罩 SVG 图标</span>
+    ├── icon-72.png        <span style="color:#a08060">← Android 小尺寸</span>
+    ├── icon-96.png        <span style="color:#a08060">← 快捷方式图标</span>
+    ├── icon-128.png
+    ├── icon-144.png
+    ├── icon-152.png       <span style="color:#a08060">← iOS 图标</span>
+    ├── icon-192.png       <span style="color:#a08060">← PWA 标准图标</span>
+    ├── icon-384.png
+    └── icon-512.png       <span style="color:#a08060">← PWA 大图标 / 启动屏</span>
+  </div>
+  <p style="margin-top:12px">✅ 以上文件已全部生成完毕。</p>
+</div>
+
+<!-- Step 2 -->
+<div class="step">
+  <div class="step-title"><span class="step-num">2</span>将项目部署到公网（必须是 HTTPS）</div>
+  <p>PWABuilder 需要通过公网 URL 访问你的 App，推荐免费方案：</p>
+  <ul style="margin-top:10px">
+    <li><strong>Vercel</strong>（最简单）— 拖拽文件夹即可部署</li>
+    <li><strong>GitHub Pages</strong> — 上传到仓库后启用 Pages</li>
+    <li><strong>腾讯云 CloudBase</strong> — 国内速度更快</li>
+  </ul>
+
+  <div class="highlight">
+    <strong>📌 推荐：用 Vercel 拖拽部署</strong><br/>
+    1. 打开 <a href="https://vercel.com" class="link" target="_blank">vercel.com</a> → 注册/登录<br/>
+    2. 点击 <strong>Add New → Project → Browse</strong>（选文件夹方式）<br/>
+    3. 直接把整个 <code>Claw</code> 文件夹<strong>拖入上传区域</strong>（推荐！会自动保留子目录结构）<br/>
+    4. 几秒后获得类似 <code>https://your-app.vercel.app</code> 的地址
+  </div>
+
+  <div class="tip" style="margin-top:14px">
+    <strong>⚠️ 注意：「上传文件」按钮不支持子目录！</strong><br/>
+    Vercel 文件管理里点「+」→「上传文件」<strong>只能传单层文件</strong>，无法自动创建 <code>icons/</code> 子目录。<br/>
+    如果你已经点了这个按钮，正确做法是：<br/>
+    &nbsp;&nbsp;① 先点「+」→ <strong>「新建文件夹」</strong>，输入 <code>icons</code>，创建好目录<br/>
+    &nbsp;&nbsp;② <strong>进入 icons 文件夹</strong>后，再点「+」→「上传文件」，上传 SVG 和 PNG 图标<br/>
+    &nbsp;&nbsp;③ 返回根目录，继续上传根目录下的其他文件（<code>index.html</code>、<code>sw.js</code> 等）<br/>
+    <br/>
+    💡 <strong>最省事的方式</strong>：整个文件夹直接拖拽到 Vercel 的拖拽区，一次搞定，不用手动建目录。
+  </div>
+</div>
+
+<!-- Step 3 -->
+<div class="step">
+  <div class="step-title"><span class="step-num">3</span>用 PWABuilder 生成 APK</div>
+  <p>获取到 HTTPS 地址后：</p>
+  <ul style="margin-top:10px">
+    <li>打开 <a href="https://www.pwabuilder.com" class="link" target="_blank">pwabuilder.com</a></li>
+    <li>在输入框粘贴你的网址，点击 <strong>Start</strong></li>
+    <li>等待分析完成（会给出 PWA 评分）</li>
+    <li>点击 <strong>Package for Stores</strong></li>
+    <li>选择 <strong>Android</strong></li>
+    <li>点击 <strong>Generate Package</strong></li>
+    <li>下载生成的 <code>.apk</code> 文件</li>
+  </ul>
+  <a href="https://www.pwabuilder.com" class="btn-link" target="_blank">打开 PWABuilder →</a>
+
+  <div class="tip">
+    💡 PWABuilder 生成的是基于 <strong>TWA（Trusted Web Activity）</strong> 的 APK，
+    本质上是一个 Chrome 容器运行你的网页，性能接近原生 App，完全免费。
+  </div>
+</div>
+
+<!-- Step 4 -->
+<div class="step">
+  <div class="step-title"><span class="step-num">4</span>安装到手机</div>
+  <ul>
+    <li>将 <code>.apk</code> 文件传到 Android 手机（微信/QQ/USB 均可）</li>
+    <li>在手机文件管理器找到该文件，点击安装</li>
+    <li>如提示"未知来源"，在设置里允许即可</li>
+    <li>安装后在桌面找到"农历闹钟"图标，打开即用！</li>
+  </ul>
+  <div class="highlight">
+    ⚠️ <strong>注意</strong>：TWA 方案依赖手机上已安装的 Chrome（版本 ≥ 72），
+    国内大多数 Android 手机都已满足。
+  </div>
+</div>
+
+<!-- Step 5 备选 -->
+<div class="step">
+  <div class="step-title"><span class="step-num">5</span>备选：直接用浏览器"添加到桌面"</div>
+  <p>如果不想折腾 APK，还有个零门槛方案：</p>
+  <ul style="margin-top:8px">
+    <li>在 Android 手机的 <strong>Chrome 浏览器</strong>打开你的网址</li>
+    <li>点击右上角 <strong>菜单（⋮）→ 添加到主屏幕</strong></li>
+    <li>App 图标就出现在桌面了，体验和安装版一样</li>
+    <li>iOS 用 Safari 打开 → <strong>分享 → 添加到主屏幕</strong></li>
+  </ul>
+  <div class="tip">✨ 这个方法连服务器都不需要，直接打开 HTML 文件即可在本地使用。</div>
+</div>
+
+<div class="done">🎉</div>
+<p style="text-align:center;color:#a08060;font-size:13px;padding-bottom:40px">按以上步骤操作，大约 15 分钟即可完成 APK 打包！</p>
+
+</body>
+</html>

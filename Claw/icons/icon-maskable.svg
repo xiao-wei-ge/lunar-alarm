@@ -1,0 +1,47 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <!-- maskable 图标：内容缩小到安全区域 (中心 80%) -->
+  <defs>
+    <radialGradient id="bg2" cx="50%" cy="50%" r="70%">
+      <stop offset="0%" stop-color="#2a0800"/>
+      <stop offset="100%" stop-color="#0f0600"/>
+    </radialGradient>
+    <radialGradient id="lg2" cx="38%" cy="38%" r="65%">
+      <stop offset="0%" stop-color="#f04828"/>
+      <stop offset="55%" stop-color="#c0392b"/>
+      <stop offset="100%" stop-color="#7a1810"/>
+    </radialGradient>
+    <linearGradient id="gs2" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#ffe066"/>
+      <stop offset="50%" stop-color="#d4a017"/>
+      <stop offset="100%" stop-color="#a07010"/>
+    </linearGradient>
+  </defs>
+
+  <!-- 全出血背景（maskable 必须填满） -->
+  <rect width="512" height="512" fill="url(#bg2)"/>
+
+  <!-- 内容缩放到安全区域（约 80%，即从 51px 到 461px） -->
+  <g transform="translate(56, 56) scale(0.78)">
+    <line x1="256" y1="58" x2="256" y2="95" stroke="#d4a017" stroke-width="8" stroke-linecap="round"/>
+    <rect x="176" y="86" width="160" height="32" rx="8" fill="url(#gs2)"/>
+    <ellipse cx="256" cy="282" rx="148" ry="174" fill="url(#lg2)"/>
+    <line x1="256" y1="112" x2="256" y2="452" stroke="rgba(212,160,23,0.4)" stroke-width="6"/>
+    <line x1="197" y1="120" x2="190" y2="448" stroke="rgba(212,160,23,0.25)" stroke-width="4"/>
+    <line x1="315" y1="120" x2="322" y2="448" stroke="rgba(212,160,23,0.25)" stroke-width="4"/>
+    <ellipse cx="210" cy="220" rx="48" ry="40" fill="rgba(255,120,80,0.25)"/>
+    <ellipse cx="256" cy="282" rx="148" ry="174" fill="none" stroke="url(#gs2)" stroke-width="10"/>
+    <rect x="176" y="450" width="160" height="32" rx="8" fill="url(#gs2)"/>
+    <g stroke="#d4a017" stroke-width="5" stroke-linecap="round" opacity="0.9">
+      <line x1="206" y1="482" x2="200" y2="510"/>
+      <line x1="228" y1="482" x2="224" y2="512"/>
+      <line x1="256" y1="482" x2="256" y2="512"/>
+      <line x1="284" y1="482" x2="288" y2="512"/>
+      <line x1="306" y1="482" x2="312" y2="510"/>
+    </g>
+    <text x="256" y="310"
+          font-family="SimSun, STSong, serif"
+          font-size="138" font-weight="bold"
+          text-anchor="middle" dominant-baseline="middle"
+          fill="#ffe066">农</text>
+  </g>
+</svg>

@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html>
+<head><meta charset="UTF-8"/></head>
+<body>
+<canvas id="c"></canvas>
+<script>
+// 生成灯笼图标并自动下载多尺寸 PNG
+const sizes = [72, 96, 128, 144, 152, 192, 384, 512];
+
+function drawIcon(size) {
+  const canvas = document.createElement('canvas');
+  canvas.width = size;
+  canvas.height = size;
+  const ctx = canvas.getContext('2d');
+  const s = size;
+  const cx = s / 2, cy = s / 2;
+
+  // 背景 - 深红渐变
+  const bg = ctx.createRadialGradient(cx, cy * 0.8, s * 0.05, cx, cy, s * 0.7);
+  bg.addColorStop(0, '#8b1a10');
+  bg.addColorStop(1, '#0f0600');
+  ctx.fillStyle = bg;
+  roundRect(ctx, 0, 0, s, s, s * 0.2);
+  ctx.fill();
+
+  // 灯笼主体
+  const lw = s * 0.42, lh = s * 0.5;
+  const lx = cx - lw / 2, ly = cy - lh / 2 + s * 0.02;
+
+  // 灯笼顶盖
+  ctx.fillStyle = '#d4a017';
+  roundRect(ctx, cx - lw * 0.3, ly - s * 0.05, lw * 0.6, s * 0.06, s * 0.02);
+  ctx.fill();
+
+  // 灯笼竖线（绳子）
+  ctx.strokeStyle = '#d4a017';
+  ctx.lineWidth = s * 0.012;
+  ctx.beginPath();
+  ctx.moveTo(cx, ly - s * 0.1);
+  ctx.lineTo(cx, ly - s * 0.05);
+  ctx.stroke();
+
+  // 灯笼椭圆体
+  const lanternGrad = ctx.createRadialGradient(cx - lw * 0.1, cy, lw * 0.1, cx, cy, lw * 0.6);
+  lanternGrad.addColorStop(0, '#f04020');
+  lanternGrad.addColorStop(0.6, '#c0392b');
+  lanternGrad.addColorStop(1, '#7a1810');
+  ctx.fillStyle = lanternGrad;
+  ctx.beginPath();
+  ctx.ellipse(cx, cy + s * 0.02, lw / 2, lh / 2, 0, 0, Math.PI * 2);
+  ctx.fill();
+
+  // 灯笼竖条纹
+  ctx.strokeStyle = 'rgba(212,160,23,0.5)';
+  ctx.lineWidth = s * 0.008;
+  for (let i = -2; i <= 2; i++) {
+    const px = cx + i * (lw / 5);
+    const halfH = Math.sqrt(Math.max(0, 1 - Math.pow((px - cx) / (lw / 2), 2))) * (lh / 2);
+    ctx.beginPath();
+    ctx.moveTo(px, cy + s * 0.02 - halfH);
+    ctx.lineTo(px, cy + s * 0.02 + halfH);
+    ctx.stroke();
+  }
+
+  // 灯笼边框
+  ctx.strokeStyle = '#d4a017';
+  ctx.lineWidth = s * 0.02;
+  ctx.beginPath();
+  ctx.ellipse(cx, cy + s * 0.02, lw / 2, lh / 2, 0, 0, Math.PI * 2);
+  ctx.stroke();
+
+  // 底盖
+  ctx.fillStyle = '#d4a017';
+  roundRect(ctx, cx - lw * 0.3, ly + lh - s * 0.01, lw * 0.6, s * 0.06, s * 0.02);
+  ctx.fill();
+
+  // 流苏
+  ctx.strokeStyle = '#d4a017';
+  ctx.lineWidth = s * 0.012;
+  const tasselY = ly + lh + s * 0.05;
+  const tasselLen = s * 0.1;
+  const tasselCount = 5;
+  for (let i = 0; i < tasselCount; i++) {
+    const tx = cx - lw * 0.25 + i * (lw * 0.5 / (tasselCount - 1));
+    ctx.beginPath();
+    ctx.moveTo(tx, tasselY);
+    ctx.lineTo(tx + (Math.random() - 0.5) * s * 0.03, tasselY + tasselLen);
+    ctx.stroke();
+  }
+
+  // 中间文字"农"
+  ctx.fillStyle = '#ffe066';
+  ctx.font = `bold ${s * 0.22}px serif`;
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.shadowColor = 'rgba(0,0,0,0.5)';
+  ctx.shadowBlur = s * 0.04;
+  ctx.fillText('农', cx, cy + s * 0.02);
+  ctx.shadowBlur = 0;
+
+  return canvas;
+}
+
+function roundRect(ctx, x, y, w, h, r) {
+  ctx.beginPath();
+  ctx.moveTo(x + r, y);
+  ctx.lineTo(x + w - r, y);
+  ctx.quadraticCurveTo(x + w, y, x + w, y + r);
+  ctx.lineTo(x + w, y + h - r);
+  ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
+  ctx.lineTo(x + r, y + h);
+  ctx.quadraticCurveTo(x, y + h, x, y + h - r);
+  ctx.lineTo(x, y + r);
+  ctx.quadraticCurveTo(x, y, x + r, y);
+  ctx.closePath();
+}
+
+// 下载所有尺寸
+async function downloadAll() {
+  for (const size of sizes) {
+    await new Promise(resolve => {
+      const canvas = drawIcon(size);
+      canvas.toBlob(blob => {
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = `icon-${size}.png`;
+        a.click();
+        setTimeout(resolve, 300);
+      }, 'image/png');
+    });
+  }
+  document.body.innerHTML = '<h2 style="color:green;font-family:sans-serif">✅ 所有图标已下载完成！请将这些 PNG 文件放入 icons/ 文件夹</h2>';
+}
+
+// 预览 512
+window.onload = () => {
+  const preview = drawIcon(512);
+  preview.style.cssText = 'display:block;margin:20px auto;border-radius:20%;box-shadow:0 4px 20px rgba(0,0,0,0.3)';
+  document.body.style.background = '#222';
+  document.body.innerHTML = '';
+  document.body.appendChild(preview);
+  const btn = document.createElement('button');
+  btn.textContent = '下载所有图标';
+  btn.style.cssText = 'display:block;margin:20px auto;padding:12px 32px;background:#c0392b;color:#fff;border:none;border-radius:30px;font-size:16px;cursor:pointer';
+  btn.onclick = downloadAll;
+  document.body.appendChild(btn);
+};
+</script>
+</body>
+</html>
